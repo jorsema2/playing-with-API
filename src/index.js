@@ -2,24 +2,22 @@ import React, {useState} from "react";
 import ReactDOM from "react-dom";
 
 const Searcher = (props) => {
-    const [value, setValue] = useState("");
 
     function handleChange(e) {
-        setValue(e.target.value);
+        props.setValue(e.target.value);
     };
 
     function handleForm(e) {
         e.preventDefault();
-        props.setInput(value);
-        console.log(value);
-        setValue("");
+        props.setInput(props.value);
+        props.setValue("");
         console.log(props.input);
     };
 
     return (
         <form onSubmit={handleForm}>
-            <input onChange={handleChange} value={value}></input>
-            <button onClick={props.setInput(props.input)}>Search</button>
+            <input onChange={handleChange} value={props.value}></input>
+            <button >Search</button>
         </form>
     )
 };
@@ -32,7 +30,7 @@ function UserInfo(props) {
         })
     return (
         <div>
-            <Searcher input={props.input} setInput={props.setInput} />
+            <Searcher input={props.input} setInput={props.setInput} value={props.value} setValue={props.setValue}/>
             <p>{props.user.login}</p>
             <img src={props.user.avatar_url} alt="Avatar of the user"></img>
             <p>{props.user.id}</p>
@@ -43,9 +41,10 @@ function UserInfo(props) {
 const UserSearcher = () => {
     const [user, setUser] = useState({});
     const [input, setInput] = useState("");
+    const [value, setValue] = useState("");
     return (
         <div>
-            <UserInfo user={user} setUser={setUser} input={input} setInput={setInput}/>
+            <UserInfo user={user} setUser={setUser} input={input} setInput={setInput} value={value} setValue={setValue} />
         </div>    
     )
 };
