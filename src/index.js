@@ -1,36 +1,44 @@
-import React, {useState} from "react";
+import React, {useState, useEffect} from "react";
 import ReactDOM from "react-dom";
 
 const Searcher = (props) => {
-
+    const [value, setValue] = useState("");
     function handleChange(e) {
-        props.setValue(e.target.value);
+        setValue(e.target.value);
     };
 
     function handleForm(e) {
         e.preventDefault();
-        props.setInput(props.value);
-        props.setValue("");
-        console.log(props.input);
+        setValue("");
+        fetch(`https://api.github.com/users/${value}`)
+        .then(data => data.json())
+        .then(data => {
+            props.setUser(data);
+        });
     };
+
+    console.log('rerendering')
 
     return (
         <form onSubmit={handleForm}>
-            <input onChange={handleChange} value={props.value}></input>
+            <input onChange={handleChange} value={value}></input>
             <button >Search</button>
         </form>
     )
 };
 
 function UserInfo(props) {
-    fetch("https://api.github.com/users/octocat")
-        .then(data => data.json())
-        .then(data => {
-            props.setUser(data);
-        })
+    // useEffect(() => {
+    //     fetch("https://api.github.com/users/octocat")
+    //     .then(data => data.json())
+    //     .then(data => {
+    //         props.setUser(data);
+    //     });
+    //     // eslint-disable-next-line
+    // }, []);
+
     return (
         <div>
-            <Searcher input={props.input} setInput={props.setInput} value={props.value} setValue={props.setValue}/>
             <p>{props.user.login}</p>
             <img src={props.user.avatar_url} alt="Avatar of the user"></img>
             <p>{props.user.id}</p>
@@ -41,12 +49,45 @@ function UserInfo(props) {
 const UserSearcher = () => {
     const [user, setUser] = useState({});
     const [input, setInput] = useState("");
-    const [value, setValue] = useState("");
+
     return (
         <div>
-            <UserInfo user={user} setUser={setUser} input={input} setInput={setInput} value={value} setValue={setValue} />
+            <Searcher setUser={setUser}  />
+            <UserInfo user={user} setUser={setUser} input={input} setInput={setInput}  />
         </div>    
     )
 };
 
+
+
+
 ReactDOM.render(<UserSearcher />, document.getElementById("root"));
+
+
+/**
+ * 
+ * class App extends React.Component {
+    state = {
+        user: {}
+    }
+
+    componentDidMount(){
+        console.log('component was mounted');
+        fetch("https://api.github.com/users/octocat")
+        .then(data => data.json())
+        .then(data => {
+           this.setState({user: data})
+        });
+        
+    }
+
+    componentDidUpdate(prevProps, prevState){
+        console.log('component was updated', prevState, this.state)
+    }
+
+    render(){
+        console.log('rendering');
+    return <div>{this.state.counter}</div>
+    }
+}
+ */
