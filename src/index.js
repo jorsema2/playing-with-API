@@ -1,6 +1,7 @@
-import React, {useState, useEffect} from "react";
+import React, {useState} from "react";
 import ReactDOM from "react-dom";
 
+// Feature to search users from the GitHub API
 const Searcher = (props) => {
     const [value, setValue] = useState("");
 
@@ -8,24 +9,21 @@ const Searcher = (props) => {
         setValue(e.target.value);
     };
 
-    /*
-    Array always has to have a length between 0 and 2
-    Depending on the length of the array (use boolean or check length), modify first or second element of the array
-    */
     function handleForm(e) {
         e.preventDefault();
         setValue("");
         fetch(`https://api.github.com/users/${value}`)
         .then(data => data.json())
         .then(function(data) {
-            if (props.users.length < 2) {
-                console.log(props.users);
-                const newUsers = [...props.users, data];
+            if (props.users.length === 0) {
+                const newUsers = [data];
+                props.setUsers(newUsers);
+            } else if (props.users.length === 1) {
+                const newUsers = [data, props.users[0]];
                 props.setUsers(newUsers);
             } else {
-                console.log(props.users.pop())
                 const newUsers = [data, props.users.pop()];
-                props.setUsers(newUsers);
+                props.setUsers(newUsers);                
             }
         }, function(reason) {
             console.log(reason); // Error!
@@ -40,6 +38,7 @@ const Searcher = (props) => {
     )
 };
 
+// Shows different messages depending on the result of comparisons among both users:
 function UserComparator(props) {
     return (
         <div>
@@ -67,6 +66,7 @@ function UserComparator(props) {
     )
 }
 
+// Shows users' info:
 function UsersInfo(props) {
     // useEffect(() => {
     //     fetch("https://api.github.com/users/octocat")
@@ -87,6 +87,8 @@ function UsersInfo(props) {
             display: "flex", 
             justifyContent: "space-around"
             }}>
+
+            {/*If there are users chosen, show the first one:*/}
             {props.users.length > 0 &&
             <div>
                 <p>Nickname: {props.users[0].login}</p>
@@ -95,6 +97,8 @@ function UsersInfo(props) {
                 <p>Followers: {props.users[0].followers}</p>
             </div>
             }
+
+            {/*If there are two users chosen, show the second one:*/}
             {props.users.length === 2 &&
             <div>
                 <p>Nickname: {props.users[1].login}</p>
@@ -103,6 +107,8 @@ function UsersInfo(props) {
                 <p>Followers: {props.users[1].followers}</p>
             </div>
             }
+
+            {/*If there are two users chosen, compare them:*/}
             {props.users.length === 2 &&
             <UserComparator users={props.users} />
             }
@@ -121,9 +127,6 @@ const UserSearcher = () => {
         </div>    
     )
 };
-
-
-
 
 ReactDOM.render(<UserSearcher />, document.getElementById("root"));
 
